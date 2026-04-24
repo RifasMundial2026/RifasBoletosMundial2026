@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rifas Mundial</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+    url('https://images.unsplash.com/photo-1508098682722-e99c643e7f3b') no-repeat center center fixed;
+  background-size: cover;
+  color:white;
+}
+
+/* TÍTULO */
+h1 {
+  text-align:center;
+  font-family:'Anton';
+  margin:20px;
+  font-size:40px;
+  letter-spacing:2px;
+}
+
+/* CONTENEDOR */
+.container {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap:20px;
+  padding:20px;
+}
+
+/* TARJETAS */
+.card {
+  position:relative;
+  border-radius:15px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:0.4s;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* EFECTO HOVER */
+.card:hover {
+  transform: translateY(-10px) scale(1.03);
+}
+
+/* IMAGEN */
+.card img {
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  transition:0.5s;
+}
+
+.card:hover img {
+  transform: scale(1.1);
+}
+
+/* OVERLAY OSCURO */
+.card::after {
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+}
+
+/* CONTENIDO */
+.card-content {
+  position:absolute;
+  bottom:0;
+  padding:15px;
+  z-index:2;
+}
+
+.card h2 {
+  margin:0;
+  font-size:22px;
+}
+
+.card p {
+  margin:5px 0 0;
+  font-size:14px;
+  color:#ddd;
+}
+
+/* BADGE */
+.badge {
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:linear-gradient(45deg, red, orange);
+  padding:5px 10px;
+  border-radius:10px;
+  font-size:12px;
+  z-index:2;
+}
+
+/* EFECTO BRILLO */
+.card::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition:0.6s;
+}
+
+.card:hover::before {
+  left:100%;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎟️ RIFAS DISPONIBLES</h1>
+
+<div class="container">
+
+<div class="card" onclick="ir('rifa1.html')">
+  <span class="badge">🔥 Disponible</span>
+  <img src="https://images.unsplash.com/photo-1522778034537-20a2486be803">
+  <div class="card-content">
+    <h2>Rifa Mundial #1</h2>
+    <p>Gana boletos para el mundial</p>
+  </div>
+</div>
+
+<div class="card" onclick="ir('rifa2.html')">
+  <img src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a">
+  <div class="card-content">
+    <h2>Rifa Mundial #2</h2>
+    <p>Participa ahora</p>
+  </div>
+</div>
+
+<div class="card" onclick="ir('rifa3.html')">
+  <img src="https://images.unsplash.com/photo-1505842465776-3a8d9c7d8c6f">
+  <div class="card-content">
+    <h2>Rifa Mundial #3</h2>
+    <p>No te quedes fuera</p>
+  </div>
+</div>
+
+<div class="card" onclick="ir('rifa4.html')">
+  <img src="https://images.unsplash.com/photo-1508098682722-e99c643e7f3b">
+  <div class="card-content">
+    <h2>Rifa Mundial #4</h2>
+    <p>Últimos boletos</p>
+  </div>
+</div>
+
+<div class="card" onclick="ir('rifa5.html')">
+  <img src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d">
+  <div class="card-content">
+    <h2>Rifa Mundial #5</h2>
+    <p>Gran oportunidad</p>
+  </div>
+</div>
+
+</div>
+
+<script>
+function ir(pagina){
+  window.location.href = pagina;
+}
+</script>
+
+</body>
+</html>

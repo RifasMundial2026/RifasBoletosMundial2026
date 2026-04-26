@@ -4,8 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rifa Mundial PREMIUM</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<!-- 🔥 FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 body { margin:0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);} 
@@ -77,10 +82,23 @@ canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
 
 <script>
 
+// 🔥 CONFIG FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyD2y58felmkZRByE8VAhS17pGFNmcnZ1wM",
+  authDomain: "rifa-mundial-f841a.firebaseapp.com",
+  databaseURL: "https://rifa-mundial-f841a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "rifa-mundial-f841a"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 🔐 ADMIN
 const USER_HASH = CryptoJS.MD5("GORDO123ROSO").toString();
 const PASS_HASH = CryptoJS.MD5("Rifamundial2026gordo").toString();
 
-let boletos = JSON.parse(localStorage.getItem('rifa1')) || Array(200).fill(null);
+// 🔄 DATOS
+let boletos = Array(200).fill(null);
 let seleccionados = [];
 let admin=false;
 let modo='';
@@ -88,9 +106,22 @@ let indexActual=null;
 let filtro=false;
 let anguloActual=0;
 
+// 🔥 TIEMPO REAL
+db.ref('rifa4').on('value', snapshot => {
+  let data = snapshot.val();
+  if(data){
+    boletos = data;
+  } else {
+    boletos = Array(200).fill(null);
+  }
+  render();
+});
+
+// 🔒 BLOQUEOS
 window.addEventListener('contextmenu', e=>e.preventDefault());
 window.addEventListener('keydown', e=>{ if(e.ctrlKey && e.key==='m') login(); });
 
+// 🔐 LOGIN
 function login(){
 let user=prompt('Usuario');
 let pass=prompt('Contraseña');
@@ -102,6 +133,7 @@ alert('Modo admin activado');
 }else alert('Incorrecto');
 }
 
+// 🔄 RENDER
 function render(){
 let grid=document.getElementById('grid'); grid.innerHTML='';
 boletos.forEach((n,i)=>{
@@ -116,6 +148,7 @@ grid.appendChild(div);
 actualizarProgreso(); actualizarLista(); dibujarRuleta();
 }
 
+// 🔥 CLICK
 function clickNumero(i){
 if(admin){ indexActual=i;
 if(modo==='editar' && boletos[i]){
@@ -124,35 +157,42 @@ document.getElementById('inputNombre').value=boletos[i];
 }
 if(modo==='borrar' && boletos[i]){ if(confirm('¿Borrar?')) boletos[i]=null; }
 if(modo==='asignar' && !boletos[i]){ document.getElementById('modal').style.display='flex'; }
-localStorage.setItem('rifa1',JSON.stringify(boletos)); render(); return; }
+
+db.ref('rifa4').set(boletos);
+return;
+}
 if(boletos[i]) return alert('Ya vendido');
 if(seleccionados.includes(i)) seleccionados=seleccionados.filter(x=>x!==i);
 else seleccionados.push(i);
 render();
 }
 
+// 💾 GUARDAR
 function guardarNombre(){
 let nombre=document.getElementById('inputNombre').value;
 if(nombre) boletos[indexActual]=nombre;
 document.getElementById('modal').style.display='none';
-localStorage.setItem('rifa1',JSON.stringify(boletos)); render();
+db.ref('rifa4').set(boletos);
 }
 
-function actualizarLista(){ document.getElementById('lista').innerText=seleccionados.map(n=>n+1).join(', ');} 
-
+// 📲 WHATSAPP
 function enviarWhatsApp(){
-let msg='Hola, quiero estos boletos: '+seleccionados.map(n=>n+1).join(', ');
-window.open(`https://wa.me/52TU_NUMERO?text=${encodeURIComponent(msg)}`);
+let nombre = prompt("Tu nombre:");
+let msg=`Hola soy ${nombre}, quiero los boletos: ${seleccionados.map(n=>n+1).join(', ')}`;
+window.open(`https://wa.me/521TU_NUMERO?text=${encodeURIComponent(msg)}`);
 }
 
+// 📊 PROGRESO
 function actualizarProgreso(){
 let vendidos=boletos.filter(x=>x).length;
 document.getElementById('progreso').innerText=vendidos+' / 200 vendidos';
 }
 
-function salirAdmin(){ admin=false; modo=''; document.getElementById('adminPanel').style.display='none'; document.getElementById('btnGirar').style.display='none'; }
-function toggleFiltro(){ filtro=!filtro; render(); }
+function actualizarLista(){
+document.getElementById('lista').innerText=seleccionados.map(n=>n+1).join(', ');
+}
 
+// 🎰 RULETA
 function obtenerParticipantes(){ return boletos.map((n,i)=> n?{n,i}:null).filter(Boolean); }
 
 function dibujarRuleta(){
@@ -176,6 +216,7 @@ ctx.restore();
 });
 }
 
+// 🎯 GIRAR
 function girarRuleta(){
 if(!admin) return alert('Solo admin');
 let participantes=obtenerParticipantes(); if(participantes.length===0) return;
@@ -192,7 +233,16 @@ alert(`🎉 Ganador: ${g.n} (Boleto ${g.i+1})`);
 },4000);
 }
 
-render();
+// 🔓 SALIR ADMIN
+function salirAdmin(){
+admin=false;
+modo='';
+document.getElementById('adminPanel').style.display='none';
+document.getElementById('btnGirar').style.display='none';
+}
+
+function toggleFiltro(){ filtro=!filtro; render(); }
+
 </script>
 
 </body>

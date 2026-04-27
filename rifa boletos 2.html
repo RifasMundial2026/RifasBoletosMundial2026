@@ -43,8 +43,9 @@ h1 { text-align:center; font-family:'Anton'; }
   font-size:14px;
   width:100%;
   box-sizing: border-box;
-}
- transition: all 0.2s ease;
+
+  /* 👇 AQUÍ VA */
+  transition: all 0.2s ease;
 }
 
 .numero:hover {
@@ -54,6 +55,7 @@ h1 { text-align:center; font-family:'Anton'; }
 .numero.vendido {
   background:#b30000;
 }
+
 .numero.selected {
   outline: 3px solid #FFD700;
   transform: scale(1.1);

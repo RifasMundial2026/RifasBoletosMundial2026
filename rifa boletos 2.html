@@ -98,19 +98,13 @@ let anguloActual=0;
 db.ref('rifa4').on('value', snapshot => {
   let data = snapshot.val();
 
-  if(data){
-    if(Array.isArray(data)){
-      boletos = data;
-    }else{
-      boletos = Object.values(data);
-    }
-  }else{
-    boletos = Array(200).fill(null);
-  }
+  boletos = Array(200).fill(null);
 
-  while(boletos.length < 200){
-    boletos.push(null);
+if(data){
+  for(let i = 0; i < 200; i++){
+    boletos[i] = data[i] || null;
   }
+}
 
   render();
 });
@@ -208,12 +202,16 @@ guardarDB();
 document.getElementById('modal').style.display='none';
 document.getElementById('inputNombre').value='';
 }
+if(indexActual === null){
+  alert("Error: selecciona boleto");
+  return;
+}
 
 // 🔥 FUNCIÓN CENTRAL (IMPORTANTE)
 function guardarDB(){
-db.ref('rifa4').set([...boletos])
-.then(()=> console.log("Guardado"))
-.catch(err=> alert("Error al guardar"));
+  db.ref('rifa4').set(boletos)
+  .then(()=> console.log("Guardado correcto"))
+  .catch(err=> console.error(err));
 }
 
 // 📲 WHATSAPP

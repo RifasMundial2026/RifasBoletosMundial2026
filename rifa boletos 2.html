@@ -274,6 +274,11 @@ function guardarDB(){
   db.ref('rifa4').set({
     data: boletos,
     adminKey: "123456789"
+  })
+  .then(()=> console.log("Guardado correcto"))
+  .catch(err=> {
+    console.error(err);
+    alert("Error Firebase: revisa reglas");
   });
 }
 

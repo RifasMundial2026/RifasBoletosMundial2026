@@ -6,11 +6,11 @@
 <title>Rifa Mundial PREMIUM</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <style>
 body {
@@ -28,11 +28,13 @@ body {
 }
 h1 { text-align:center; font-family:'Anton'; }
 .info { text-align:center; background:#111; color:#fff; padding:15px; border-radius:10px; margin-bottom:15px; }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
   gap: 8px;
 }
+
 .numero {
   background:#1e1e1e;
   color:#fff;
@@ -43,43 +45,65 @@ h1 { text-align:center; font-family:'Anton'; }
   font-size:14px;
   width:100%;
   box-sizing: border-box;
-
-  /* 👇 AQUÍ VA */
   transition: all 0.2s ease;
 }
 
-.numero:hover {
-  transform: scale(1.08);
-}
-
-.numero.vendido {
-  background:#b30000;
-}
-
+.numero:hover { transform: scale(1.08); }
+.numero.vendido { background:#b30000; }
 .numero.selected {
   outline: 3px solid #FFD700;
   transform: scale(1.1);
 }
-.nombre-tag{ display:block; font-size:10px; background:#fff; color:#000; border-radius:5px; margin-top:5px; }
+
+.nombre-tag{
+  display:block;
+  font-size:10px;
+  background:#fff;
+  color:#000;
+  border-radius:5px;
+  margin-top:5px;
+}
+
 .btn{ padding:10px; border:none; border-radius:5px; cursor:pointer; margin:5px; }
 .btn-wsp{ background:#25D366; color:#fff; width:100%; }
-.admin-panel{ margin-top:15px; padding:10px; background:#222; color:#fff; border-radius:10px; display:none; }
-.modal{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.7); display:none; justify-content:center; align-items:center; }
-.modal-content{ background:#fff; padding:20px; border-radius:10px; width:300px; }
-canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
+
+.admin-panel{
+  margin-top:15px;
+  padding:10px;
+  background:#222;
+  color:#fff;
+  border-radius:10px;
+  display:none;
+}
+
+.modal{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  width:300px;
+}
+
+canvas{
+  background:#fff;
+  border-radius:50%;
+  display:block;
+  margin:auto;
+}
+
 @media (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .numero {
-    font-size: 12px;
-    padding: 10px 3px;
-  }
-
-  .container {
-    padding: 10px;
-  }
+  .grid { grid-template-columns: repeat(4, 1fr); }
+  .numero { font-size: 12px; padding: 10px 3px; }
+  .container { padding: 10px; }
 }
 </style>
 </head>
@@ -98,7 +122,6 @@ canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
 <h3 id="progreso"></h3>
 <div id="grid" class="grid"></div>
 
-<!-- 👇 AQUÍ LO PEGAS -->
 <div id="carrito">
 <strong>Boletos seleccionados:</strong>
 <div id="lista"></div>
@@ -130,7 +153,7 @@ canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
 
 <script>
 
-// 🔥 CONFIG CORRECTA (AQUÍ ESTABA TU ERROR)
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyD2y58felmkZRByE8VAhS17pGFNmcnZ1wM",
   authDomain: "rifa-mundial-f841a.firebaseapp.com",
@@ -139,11 +162,9 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 
-// 🔐 ADMIN
-const USER_HASH = CryptoJS.MD5("GORDO123ROSO").toString();
-const PASS_HASH = CryptoJS.MD5("Rifamundial2026gordo").toString();
+const db = firebase.database();
+const auth = firebase.auth();
 
 // 🔄 VARIABLES
 let boletos = Array(200).fill(null);
@@ -153,48 +174,42 @@ let modo='';
 let indexActual=null;
 let anguloActual=0;
 
-// 🔥 TIEMPO REAL (SOLUCIÓN CLAVE)
-db.ref('rifa4').on('value', snapshot => {
+// 🔐 LOGIN REAL
+function loginAdmin(){
+  let email = prompt("Email admin:");
+  let pass = prompt("Password:");
 
-  let raw = snapshot.val();
-  let data = raw ? raw.data : null;
+  auth.signInWithEmailAndPassword(email, pass)
+  .then(()=>{
+    admin=true;
+    document.getElementById('adminPanel').style.display='block';
+    document.getElementById('btnGirar').style.display='block';
+    alert("Admin activado 🔥");
+  })
+  .catch(()=>{
+    alert("Credenciales incorrectas");
+  });
+}
+
+// CTRL + M
+window.addEventListener('keydown', e=>{
+  if(e.ctrlKey && e.key==='m') loginAdmin();
+});
+
+// 🔥 TIEMPO REAL
+db.ref('rifa4').on('value', snapshot => {
+  let data = snapshot.val();
 
   boletos = Array(200).fill(null);
 
   if(data){
-    for(let i = 0; i < 200; i++){
+    for(let i=0;i<200;i++){
       boletos[i] = data[i] || null;
     }
   }
 
   render();
 });
-// 🔐 LOGIN
-window.addEventListener('keydown', e=>{
-if(e.ctrlKey && e.key==='m') login();
-});
-
-function login(){
-let user = prompt("Usuario");
-let pass = prompt("Contraseña");
-
-if(!user || !pass) return;
-
-user=user.trim();
-pass=pass.trim();
-
-if(
-CryptoJS.MD5(user).toString()===USER_HASH &&
-CryptoJS.MD5(pass).toString()===PASS_HASH
-){
-admin=true;
-document.getElementById('adminPanel').style.display='block';
-document.getElementById('btnGirar').style.display='block';
-alert("Admin activado");
-}else{
-alert("Incorrecto");
-}
-}
 
 // 🎯 RENDER
 function render(){
@@ -213,7 +228,6 @@ document.getElementById('progreso').innerText=
 boletos.filter(x=>x).length+" / 200 vendidos";
 
 dibujarRuleta();
-  
 actualizarLista();
 }
 
@@ -256,11 +270,7 @@ render();
 function guardarNombre(){
 let nombre=document.getElementById('inputNombre').value.trim();
 
-if(indexActual === null){
-  alert("Error: selecciona boleto");
-  return;
-}
-
+if(indexActual === null) return alert("Selecciona boleto");
 if(!nombre) return alert("Escribe nombre");
 
 boletos[indexActual]=nombre;
@@ -269,17 +279,12 @@ guardarDB();
 document.getElementById('modal').style.display='none';
 document.getElementById('inputNombre').value='';
 }
-// 🔥 FUNCIÓN CENTRAL (IMPORTANTE)
+
+// 🔥 GUARDAR (SEGURIDAD REAL)
 function guardarDB(){
-  db.ref('rifa4').set({
-    data: boletos,
-    adminKey: "123456789"
-  })
-  .then(()=> console.log("Guardado correcto"))
-  .catch(err=> {
-    console.error(err);
-    alert("Error Firebase: revisa reglas");
-  });
+db.ref('rifa4').set(boletos)
+.then(()=> console.log("Guardado"))
+.catch(()=> alert("No autorizado (login requerido)"));
 }
 
 // 📲 WHATSAPP
@@ -344,11 +349,13 @@ alert(`Ganador: ${p[ganador].n} (#${p[ganador].i+1})`);
 
 // 🔓 SALIR
 function salirAdmin(){
+auth.signOut();
 admin=false;
 modo='';
 document.getElementById('adminPanel').style.display='none';
 document.getElementById('btnGirar').style.display='none';
 }
+
 function actualizarLista(){
 document.getElementById('lista').innerText =
 seleccionados.map(n=>n+1).join(', ');

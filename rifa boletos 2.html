@@ -166,7 +166,7 @@ document.getElementById('inputNombre').value=boletos[i];
 if(modo==='borrar' && boletos[i]){
 if(confirm('¿Borrar?')){
 boletos[i]=null;
-db.ref('rifa4').set([...boletos]);
+db.ref('rifa4').set(boletos);
 }
 }
 
@@ -193,7 +193,7 @@ let nombre=document.getElementById('inputNombre').value.trim();
 
 if(nombre){
 boletos[indexActual]=nombre;
-db.ref('rifa4').set([...boletos]);
+db.ref('rifa4').set(boletos);
 }
 
 document.getElementById('modal').style.display='none';

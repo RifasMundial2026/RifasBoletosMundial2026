@@ -155,19 +155,20 @@ let anguloActual=0;
 
 // 🔥 TIEMPO REAL (SOLUCIÓN CLAVE)
 db.ref('rifa4').on('value', snapshot => {
-  let data = snapshot.val();
+
+  let raw = snapshot.val();
+  let data = raw ? raw.data : null;
 
   boletos = Array(200).fill(null);
 
-if(data){
-  for(let i = 0; i < 200; i++){
-    boletos[i] = data[i] || null;
+  if(data){
+    for(let i = 0; i < 200; i++){
+      boletos[i] = data[i] || null;
+    }
   }
-}
 
   render();
 });
-
 // 🔐 LOGIN
 window.addEventListener('keydown', e=>{
 if(e.ctrlKey && e.key==='m') login();
@@ -270,9 +271,10 @@ document.getElementById('inputNombre').value='';
 }
 // 🔥 FUNCIÓN CENTRAL (IMPORTANTE)
 function guardarDB(){
-  db.ref('rifa4').set(boletos)
-  .then(()=> console.log("Guardado correcto"))
-  .catch(err=> console.error(err));
+  db.ref('rifa4').set({
+    data: boletos,
+    adminKey: "123456789"
+  });
 }
 
 // 📲 WHATSAPP

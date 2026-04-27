@@ -45,6 +45,12 @@ canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
 <h3 id="progreso"></h3>
 <div id="grid" class="grid"></div>
 
+<!-- 👇 AQUÍ LO PEGAS -->
+<div id="carrito">
+<strong>Boletos seleccionados:</strong>
+<div id="lista"></div>
+</div>
+
 <button class="btn btn-wsp" onclick="enviarWhatsApp()">📲 Enviar selección</button>
 
 <h2 style="text-align:center;">🎰 Sorteo en vivo</h2>
@@ -143,7 +149,7 @@ grid.innerHTML='';
 
 boletos.forEach((n,i)=>{
 let div=document.createElement('div');
-div.className='numero '+(n?'vendido':'');
+div.className='numero '+(n?'vendido':'') + (seleccionados.includes(i)?' selected':'');
 div.innerHTML=`<strong>${i+1}</strong>`+(n?`<span class="nombre-tag">${n}</span>`:'');
 div.onclick=()=>clickNumero(i);
 grid.appendChild(div);
@@ -153,6 +159,8 @@ document.getElementById('progreso').innerText=
 boletos.filter(x=>x).length+" / 200 vendidos";
 
 dibujarRuleta();
+  
+actualizarLista();
 }
 
 // 🖱️ CLICK
@@ -280,6 +288,10 @@ admin=false;
 modo='';
 document.getElementById('adminPanel').style.display='none';
 document.getElementById('btnGirar').style.display='none';
+}
+function actualizarLista(){
+document.getElementById('lista').innerText =
+seleccionados.map(n=>n+1).join(', ');
 }
 
 </script>

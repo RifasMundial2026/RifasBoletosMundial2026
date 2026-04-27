@@ -194,6 +194,11 @@ render();
 function guardarNombre(){
 let nombre=document.getElementById('inputNombre').value.trim();
 
+if(indexActual === null){
+  alert("Error: selecciona boleto");
+  return;
+}
+
 if(!nombre) return alert("Escribe nombre");
 
 boletos[indexActual]=nombre;
@@ -202,11 +207,6 @@ guardarDB();
 document.getElementById('modal').style.display='none';
 document.getElementById('inputNombre').value='';
 }
-if(indexActual === null){
-  alert("Error: selecciona boleto");
-  return;
-}
-
 // 🔥 FUNCIÓN CENTRAL (IMPORTANTE)
 function guardarDB(){
   db.ref('rifa4').set(boletos)

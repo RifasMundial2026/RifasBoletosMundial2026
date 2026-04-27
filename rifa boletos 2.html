@@ -37,7 +37,7 @@ canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
 <body>
 <div class="container">
 
-<h1>🎟️ RIFA MUNDIAL ESPAÑA VS URUGUAY </h1>
+<h1>🎟️  MUNDIAL ESPAÑA VS URUGUAY </h1>
 
 <div class="info">
 🎁 Premio: 2 Boletos del Mundial Categoria 4 GDL<br>
@@ -85,9 +85,9 @@ canvas{ background:#fff; border-radius:50%; display:block; margin:auto; }
 // CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyD2y58felmkZRByE8VAhS17pGFNmcnZ1wM",
-  authDomain: "rifa-mundial-f841a.firebaseapp.com",
-  databaseURL: "https://rifa-mundial-f841a-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "rifa-mundial-f841a"
+  authDomain: "-mundial-f841a.firebaseapp.com",
+  databaseURL: "https://-mundial-f841a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "-mundial-f841a"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -95,7 +95,7 @@ const db = firebase.database();
 
 // ADMIN
 const USER_HASH = CryptoJS.MD5("GORDO123ROSO").toString();
-const PASS_HASH = CryptoJS.MD5("Rifamundial2026gordo").toString();
+const PASS_HASH = CryptoJS.MD5("mundial2026gordo").toString();
 
 // DATOS
 let boletos = Array(200).fill(null);
@@ -166,7 +166,7 @@ document.getElementById('inputNombre').value=boletos[i];
 if(modo==='borrar' && boletos[i]){
 if(confirm('¿Borrar?')){
 boletos[i]=null;
-db.ref('rifa4').set(boletos);
+db.ref('rifa4').set([...boletos]);
 }
 }
 
@@ -193,7 +193,7 @@ let nombre=document.getElementById('inputNombre').value.trim();
 
 if(nombre){
 boletos[indexActual]=nombre;
-db.ref('rifa4').set(boletos);
+db.ref('rifa4').set([...boletos]);
 }
 
 document.getElementById('modal').style.display='none';

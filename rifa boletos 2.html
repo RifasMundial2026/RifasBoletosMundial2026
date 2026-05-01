@@ -360,6 +360,15 @@ function actualizarLista(){
 document.getElementById('lista').innerText =
 seleccionados.map(n=>n+1).join(', ');
 }
+let clicksAdmin = 0;
+
+document.querySelector('h1').addEventListener('click', () => {
+  clicksAdmin++;
+  if(clicksAdmin >= 5){
+    login();
+    clicksAdmin = 0;
+  }
+});
 
 </script>
 </body>

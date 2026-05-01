@@ -295,7 +295,7 @@ db.ref('rifas/' + RIFA_ID).set(boletos)
 function enviarWhatsApp(){
 let nombre=prompt("Tu nombre");
 let msg=`Hola soy ${nombre}, quiero boletos: ${seleccionados.map(n=>n+1).join(', ')}`;
-window.open(`https://wa.me/52523311457936?text=${encodeURIComponent(msg)}`);
+window.open(`https://wa.me/523311457936?text=${encodeURIComponent(msg)}`);
 }
 
 // 🎰 RULETA

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rifa Mundial PREMIUM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family:'Segoe UI';
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+.container {
+  max-width: 980px;
+  margin:auto;
+  padding:15px;
+  border-radius:15px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+h1 { text-align:center; font-family:'Anton'; }
+.info { text-align:center; background:#111; color:#fff; padding:15px; border-radius:10px; margin-bottom:15px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+}
+
+.numero {
+  background:#1e1e1e;
+  color:#fff;
+  border-radius:10px;
+  padding:12px 5px;
+  text-align:center;
+  cursor:pointer;
+  font-size:14px;
+  width:100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.numero:hover { transform: scale(1.08); }
+.numero.vendido { background:#b30000; }
+.numero.selected {
+  outline: 3px solid #FFD700;
+  transform: scale(1.1);
+}
+
+.nombre-tag{
+  display:block;
+  font-size:10px;
+  background:#fff;
+  color:#000;
+  border-radius:5px;
+  margin-top:5px;
+}
+
+.btn{ padding:10px; border:none; border-radius:5px; cursor:pointer; margin:5px; }
+.btn-wsp{ background:#25D366; color:#fff; width:100%; }
+
+.admin-panel{
+  margin-top:15px;
+  padding:10px;
+  background:#222;
+  color:#fff;
+  border-radius:10px;
+  display:none;
+}
+
+.modal{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  width:300px;
+}
+
+canvas{
+  background:#fff;
+  border-radius:50%;
+  display:block;
+  margin:auto;
+}
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+  .numero { font-size: 12px; padding: 10px 3px; }
+  .container { padding: 10px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🎟️ MUNDIAL mexico VS URUGUAY</h1>
+
+<div class="info">
+🎁 Premio: 2 Boletos del Mundial<br>
+💰 Precio: $250 MXN<br>
+📅 Sorteo en vivo
+</div>
+
+<h3 id="progreso"></h3>
+<div id="grid" class="grid"></div>
+
+<div id="carrito">
+<strong>Boletos seleccionados:</strong>
+<div id="lista"></div>
+</div>
+
+<button class="btn btn-wsp" onclick="enviarWhatsApp()">📲 Enviar selección</button>
+
+<h2 style="text-align:center;">🎰 Sorteo en vivo</h2>
+<canvas id="ruleta" width="350" height="350"></canvas>
+<button id="btnGirar" style="display:none;margin:auto;" onclick="girarRuleta()">🎯 Girar</button>
+
+<div id="adminPanel" class="admin-panel">
+<h3>Admin</h3>
+<button onclick="modo='editar'">Editar</button>
+<button onclick="modo='borrar'">Borrar</button>
+<button onclick="modo='asignar'">Asignar</button>
+<button onclick="salirAdmin()">Salir</button>
+</div>
+
+</div>
+
+<div id="modal" class="modal">
+<div class="modal-content">
+<input id="inputNombre" placeholder="Nombre">
+<br><br>
+<button onclick="guardarNombre()">Guardar</button>
+</div>
+</div>
+
+<script>
+
+// 🔥 FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyD2y58felmkZRByE8VAhS17pGFNmcnZ1wM",
+  authDomain: "rifa-mundial-f841a.firebaseapp.com",
+  databaseURL: "https://rifa-mundial-f841a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "rifa-mundial-f841a"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+const auth = firebase.auth();
+  const RIFA_ID = "rifa5";
+
+// 🔄 VARIABLES
+let boletos = Array(200).fill(null);
+let seleccionados = [];
+let admin=false;
+let modo='';
+let indexActual=null;
+let anguloActual=0;
+
+// 🔐 LOGIN REAL
+function loginAdmin(){
+  let email = prompt("Email admin:");
+  let pass = prompt("Password:");
+
+  auth.signInWithEmailAndPassword(email, pass)
+  .then(()=>{
+    admin=true;
+    document.getElementById('adminPanel').style.display='block';
+    document.getElementById('btnGirar').style.display='block';
+    alert("Admin activado 🔥");
+  })
+  .catch(()=>{
+    alert("Credenciales incorrectas");
+  });
+}
+
+// CTRL + M
+window.addEventListener('keydown', e=>{
+  if(e.ctrlKey && e.key==='m') loginAdmin();
+});
+
+// 🔥 TIEMPO REAL
+db.ref('rifas/' + RIFA_ID).on('value', snapshot => {
+  let data = snapshot.val();
+
+  boletos = Array(200).fill(null);
+
+  if(data){
+    for(let i=0;i<200;i++){
+      boletos[i] = data[i] || null;
+    }
+  }
+
+  render();
+});
+
+// 🎯 RENDER
+function render(){
+let grid=document.getElementById('grid');
+grid.innerHTML='';
+
+boletos.forEach((n,i)=>{
+let div=document.createElement('div');
+div.className='numero '+(n?'vendido':'') + (seleccionados.includes(i)?' selected':'');
+div.innerHTML=`<strong>${i+1}</strong>`+(n?`<span class="nombre-tag">${n}</span>`:'');
+div.onclick=()=>clickNumero(i);
+grid.appendChild(div);
+});
+
+document.getElementById('progreso').innerText=
+boletos.filter(x=>x).length+" / 200 vendidos";
+
+dibujarRuleta();
+actualizarLista();
+}
+
+// 🖱️ CLICK
+function clickNumero(i){
+if(admin){
+indexActual=i;
+
+if(modo==='editar' && boletos[i]){
+document.getElementById('modal').style.display='flex';
+document.getElementById('inputNombre').value=boletos[i];
+}
+
+if(modo==='borrar' && boletos[i]){
+if(confirm("Borrar")){
+boletos[i]=null;
+guardarDB();
+}
+}
+
+if(modo==='asignar' && !boletos[i]){
+document.getElementById('modal').style.display='flex';
+}
+
+return;
+}
+
+if(boletos[i]) return alert("Ya vendido");
+
+if(seleccionados.includes(i)){
+seleccionados=seleccionados.filter(x=>x!==i);
+}else{
+seleccionados.push(i);
+}
+
+render();
+}
+
+// 💾 GUARDAR
+function guardarNombre(){
+let nombre=document.getElementById('inputNombre').value.trim();
+
+if(indexActual === null) return alert("Selecciona boleto");
+if(!nombre) return alert("Escribe nombre");
+
+boletos[indexActual]=nombre;
+guardarDB();
+
+document.getElementById('modal').style.display='none';
+document.getElementById('inputNombre').value='';
+}
+
+// 🔥 GUARDAR (SEGURIDAD REAL)
+function guardarDB(){
+db.ref('rifas/' + RIFA_ID).set(boletos)
+.then(()=> console.log("Guardado"))
+.catch(()=> alert("No autorizado (login requerido)"));
+}
+
+// 📲 WHATSAPP
+function enviarWhatsApp(){
+let nombre=prompt("Tu nombre");
+let msg=`Hola soy ${nombre}, quiero boletos: ${seleccionados.map(n=>n+1).join(', ')}`;
+window.open(`https://wa.me/521TU_NUMERO?text=${encodeURIComponent(msg)}`);
+}
+
+// 🎰 RULETA
+function obtenerParticipantes(){
+return boletos.map((n,i)=> n?{n,i}:null).filter(Boolean);
+}
+
+function dibujarRuleta(){
+let c=document.getElementById('ruleta');
+let ctx=c.getContext('2d');
+let p=obtenerParticipantes();
+let total=p.length;
+
+ctx.clearRect(0,0,350,350);
+if(total===0) return;
+
+let ang=(2*Math.PI)/total;
+
+p.forEach((x,i)=>{
+ctx.beginPath();
+ctx.moveTo(175,175);
+ctx.arc(175,175,175,i*ang,(i+1)*ang);
+ctx.fillStyle=`hsl(${i*360/total},70%,50%)`;
+ctx.fill();
+
+ctx.save();
+ctx.translate(175,175);
+ctx.rotate(i*ang+ang/2);
+ctx.fillStyle='#fff';
+ctx.fillText(x.i+1,120,5);
+ctx.restore();
+});
+}
+
+// 🎯 GIRAR
+function girarRuleta(){
+if(!admin) return;
+
+let p=obtenerParticipantes();
+if(p.length===0) return;
+
+let ganador=Math.floor(Math.random()*p.length);
+let giro=3600+(360-(ganador*(360/p.length)));
+
+anguloActual+=giro;
+let c=document.getElementById('ruleta');
+
+c.style.transition='transform 4s ease-out';
+c.style.transform=`rotate(${anguloActual}deg)`;
+
+setTimeout(()=>{
+alert(`Ganador: ${p[ganador].n} (#${p[ganador].i+1})`);
+},4000);
+}
+
+// 🔓 SALIR
+function salirAdmin(){
+auth.signOut();
+admin=false;
+modo='';
+document.getElementById('adminPanel').style.display='none';
+document.getElementById('btnGirar').style.display='none';
+}
+
+function actualizarLista(){
+document.getElementById('lista').innerText =
+seleccionados.map(n=>n+1).join(', ');
+}
+
+</script>
+</body>
+</html>

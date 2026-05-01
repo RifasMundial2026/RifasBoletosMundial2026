@@ -192,8 +192,11 @@ function loginAdmin(){
 }
 
 // CTRL + M
-window.addEventListener('keydown', e=>{
-  if(e.ctrlKey && e.key==='m') loginAdmin();
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key.toLowerCase() === 'm') {
+    e.preventDefault();
+    loginAdmin();
+  }
 });
 
 // 🔥 TIEMPO REAL

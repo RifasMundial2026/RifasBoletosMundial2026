@@ -123,6 +123,17 @@ canvas{
 .btn-wsp-float:hover {
   transform: scale(1.05);
 }
+.prueba {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.img-boleto {
+  min-width: 280px;
+  border-radius: 10px;
+}
 </style>
 </head>
 
@@ -136,7 +147,11 @@ canvas{
 💰 Precio: $250 MXN<br>
 📅 Sorteo en vivo
 </div>
-
+<div class="prueba">
+  <h3>🎫 Boletos reales del premio</h3>
+  <img src="boleto1.jpg" class="img-boleto">
+  <img src="boleto2.jpg" class="img-boleto">
+</div>
 <h3 id="progreso"></h3>
 <div id="grid" class="grid"></div>
 

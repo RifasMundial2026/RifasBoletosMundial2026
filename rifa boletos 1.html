@@ -105,14 +105,23 @@ canvas{
   .numero { font-size: 12px; padding: 10px 3px; }
   .container { padding: 10px; }
 }
-  
-btn-wsp {
+.btn-wsp-float {
   position: fixed;
   bottom: 15px;
-  left: 10px;
-  right: 10px;
-  width: auto;
-  z-index: 1000;
+  right: 15px;
+  background: #25D366;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  z-index: 999;
+  border: none;
+}
+
+.btn-wsp-float:hover {
+  transform: scale(1.05);
 }
 </style>
 </head>
@@ -297,8 +306,7 @@ document.getElementById('inputNombre').value='';
 function guardarDB(){
 db.ref('rifas/' + RIFA_ID).set(boletos)
 .then(()=> console.log("Guardado"))
-.catch(()=> alert("No autorizado (login requerido)"));
-}
+.catch(()=> alert("No autorizado (login requerido)"));<button class="btn-wsp-float" onclick="enviarWhatsApp()">
 
 // 📲 WHATSAPP
 function enviarWhatsApp(){
@@ -373,7 +381,9 @@ function actualizarLista(){
 document.getElementById('lista').innerText =
 seleccionados.map(n=>n+1).join(', ');
 }
-
+<button class="btn-wsp-float" onclick="enviarWhatsApp()">
+📲 Enviar selección
+</button>
 </script>
 </body>
 </html>

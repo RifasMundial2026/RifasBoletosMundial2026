@@ -105,6 +105,24 @@ canvas{
   .numero { font-size: 12px; padding: 10px 3px; }
   .container { padding: 10px; }
 }
+  .btn-wsp-float {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: #25D366;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  z-index: 999;
+  border: none;
+}
+
+.btn-wsp-float:hover {
+  transform: scale(1.05);
+}
 </style>
 </head>
 
@@ -365,5 +383,8 @@ seleccionados.map(n=>n+1).join(', ');
 }
 
 </script>
+<button class="btn-wsp-float" onclick="enviarWhatsApp()">
+📲 Enviar selección
+</button>
 </body>
 </html>

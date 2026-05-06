@@ -125,7 +125,9 @@ canvas{
 }
 </style>
 </head>
-
+<button class="btn-wsp-float" onclick="enviarWhatsApp()">
+📲 Enviar selección
+</button>
 <body>
 <div class="container">
 
@@ -381,9 +383,6 @@ function actualizarLista(){
 document.getElementById('lista').innerText =
 seleccionados.map(n=>n+1).join(', ');
 }
-<button class="btn-wsp-float" onclick="enviarWhatsApp()">
-📲 Enviar selección
-</button>
 </script>
 </body>
 </html>

@@ -107,17 +107,18 @@ canvas{
 }
 </style>
 </head>
+
 <body>
 <div class="container">
 
-<h1>🎟️ MUNDIAL mexico VS URUGUAY</h1>
+<h1>🎟️ MUNDIAL ESPAÑA VS URUGUAY</h1>
 
 <div class="info">
 🎁 Premio: 2 Boletos del Mundial<br>
 💰 Precio: $250 MXN<br>
 📅 Sorteo en vivo
 </div>
-
+  
 <h3 id="progreso"></h3>
 <div id="grid" class="grid"></div>
 
@@ -164,8 +165,7 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 const auth = firebase.auth();
-  const RIFA_ID = "rifa2";
-
+const RIFA_ID = "rifa2";
 // 🔄 VARIABLES
 let boletos = Array(200).fill(null);
 let seleccionados = [];
@@ -287,7 +287,8 @@ document.getElementById('inputNombre').value='';
 function guardarDB(){
 db.ref('rifas/' + RIFA_ID).set(boletos)
 .then(()=> console.log("Guardado"))
-.catch(()=> alert("No autorizado (login requerido)"));<button class="btn-wsp-float" onclick="enviarWhatsApp()">
+.catch(()=> alert("No autorizado (login requerido)"));
+}
 
 // 📲 WHATSAPP
 function enviarWhatsApp(){
@@ -362,6 +363,7 @@ function actualizarLista(){
 document.getElementById('lista').innerText =
 seleccionados.map(n=>n+1).join(', ');
 }
+
 </script>
 </body>
 </html>

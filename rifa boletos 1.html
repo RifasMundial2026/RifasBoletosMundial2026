@@ -342,7 +342,7 @@ db.ref('rifas/' + RIFA_ID).set(boletos)
 // 📲 WHATSAPP
 function enviarWhatsApp(){
 let nombre=prompt("Tu nombre");
-let msg=`Hola soy ${nombre}, quiero boletos: ${seleccionados.map(n=>n+1).join(', ')}`;
+let msg=`Hola soy ${nombre}, quiero comprar los boletos: ${seleccionados.map(n=>n+1).join(', ')}`;
 window.open(`https://wa.me/523311457936?text=${encodeURIComponent(msg)}`);
 }
 

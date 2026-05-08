@@ -216,7 +216,9 @@ const auth = firebase.auth();
   const RIFA_ID = "rifa3";
 
 // 🔄 VARIABLES
-let boletos = Array(200).fill(null);
+lconst TOTAL_BOLETOS = 300;
+
+let boletos = Array(TOTAL_BOLETOS).fill(null);
 let seleccionados = [];
 let admin=false;
 let modo='';
@@ -252,13 +254,13 @@ document.addEventListener('keydown', function(e) {
 db.ref('rifas/' + RIFA_ID).on('value', snapshot => {
   let data = snapshot.val();
 
-  boletos = Array(200).fill(null);
+boletos = Array(TOTAL_BOLETOS).fill(null);
 
-  if(data){
-    for(let i=0;i<200;i++){
-      boletos[i] = data[i] || null;
-    }
+if(data){
+  for(let i=0;i<TOTAL_BOLETOS;i++){
+    boletos[i] = data[i] || null;
   }
+}
 
   render();
 });
@@ -277,7 +279,7 @@ grid.appendChild(div);
 });
 
 document.getElementById('progreso').innerText=
-boletos.filter(x=>x).length+" / 200 vendidos";
+boletos.filter(x=>x).length+" / 300 vendidos";
 
 dibujarRuleta();
 actualizarLista();
